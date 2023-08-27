@@ -15,13 +15,16 @@ namespace KBM.Identidade.API.Controllers;
 public class IdentidadeController : MainController
 {
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly AppSettings _appSettings;
 
     public IdentidadeController(UserManager<IdentityUser> userManager,
+                                SignInManager<IdentityUser> signInManager,
                                 IOptions<AppSettings> appSettings)
     {
         _userManager = userManager;
         _appSettings = appSettings.Value;
+        _signInManager = signInManager;
     }
 
     [HttpPost("nova-conta")]
@@ -48,6 +51,27 @@ public class IdentidadeController : MainController
 
         return CustomResponse();
     }
+
+    [HttpPost("autenticar")]
+    public async Task<ActionResult> Autenticar(UsuarioLogin usuarioLogin)
+    {
+        if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+        var resultado = await _signInManager.PasswordSignInAsync(usuarioLogin.Email, usuarioLogin.Senha, false, true);
+
+        if (resultado.Succeeded)        
+            return CustomResponse(await GerarJwt(usuarioLogin.Email));        
+
+        if (resultado.IsLockedOut)
+        {
+            AdicionarErroProcessamento("Usuário temporariamente bloqueado por tentativas inválidas");
+            return CustomResponse();
+        }
+
+        AdicionarErroProcessamento("Usuário ou Senha incorretos");
+        return CustomResponse();
+    }
+
 
     private async Task<UsuarioRespostaLogin> GerarJwt(string email)
     {
