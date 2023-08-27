@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\HomeController.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\KBM.WebAPI.Core\KBM.WebAPI.Core.csproj" />
   </ItemGroup>
 
