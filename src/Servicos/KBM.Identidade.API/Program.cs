@@ -1,34 +1,28 @@
-using KBM.Identidade.API.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using KBM.Identidade.API.Configuracoes;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AplicacaoDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("ConnectionString"), ServerVersion.Parse("8.2.0")));
+builder.Configuration.SetBasePath(builder.Environment.ContentRootPath);
+builder.Configuration.AddJsonFile("appsettings.json", true, true);
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
+builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AplicacaoDbContext>()
-    .AddDefaultTokenProviders();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<StartupBase>();
+}
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddApiConfiguration();
+
+builder.Services.AddIdentityConfiguration(builder.Configuration);
+
+builder.Services.AddSwaggerConfiguration();
+
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwaggerConfiguration();
 
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseApiConfiguration();
 
 app.Run();
