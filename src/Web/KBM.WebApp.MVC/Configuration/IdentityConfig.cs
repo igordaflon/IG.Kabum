@@ -15,9 +15,8 @@ public static class IdentityConfig
     }
 
     public static void UseIdentityConfiguration(this WebApplication app)
-    {
+    {        
         app.UseAuthentication();
         app.UseAuthorization();
-
     }
 }
