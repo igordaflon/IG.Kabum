@@ -13,7 +13,7 @@ public class AutenticacaoService : IAutenticacaoService
         _httpClient = httpClient;
     }
 
-    public async Task<string> Login(UsuarioLogin usuarioLogin)
+    public async Task<UsuarioRespostaLogin> Login(UsuarioLogin usuarioLogin)
     {
         var loginContent = new StringContent(
             JsonSerializer.Serialize(usuarioLogin),
@@ -22,12 +22,10 @@ public class AutenticacaoService : IAutenticacaoService
 
         var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/autenticar", loginContent);
 
-        var teste = await response.Content.ReadAsStringAsync();
-
-        return JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
+        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-    public async Task<string> Registro(UsuarioRegistro usuarioRegistro)
+    public async Task<UsuarioRespostaLogin> Registro(UsuarioRegistro usuarioRegistro)
     {
         var registroContent = new StringContent(
             JsonSerializer.Serialize(usuarioRegistro),
@@ -36,6 +34,6 @@ public class AutenticacaoService : IAutenticacaoService
 
         var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/nova-conta", registroContent);
 
-        return JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
+        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync());
     }
 }
