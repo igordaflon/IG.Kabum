@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace KBM.WebApp.MVC.Controllers;
 
-public class IdentidadeController : Controller
+public class IdentidadeController : MainController
 {
     private readonly IAutenticacaoService _autenticacaoService;
 
@@ -32,6 +32,9 @@ public class IdentidadeController : Controller
 
         var resposta = await _autenticacaoService.Registro(usuarioRegistro);
 
+        if(ResponsePossuiErros(resposta.ResponseResult))
+            return View(usuarioRegistro);
+
         await RealizarLogin(resposta);
 
         return RedirectToAction("Index", "Home");
@@ -51,6 +54,9 @@ public class IdentidadeController : Controller
         if (!ModelState.IsValid) return View(usuarioLogin);
 
         var resposta = await _autenticacaoService.Login(usuarioLogin);
+
+        if (ResponsePossuiErros(resposta.ResponseResult))
+            return View(usuarioLogin);
 
         await RealizarLogin(resposta);
 

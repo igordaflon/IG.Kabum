@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace KBM.WebApp.MVC.Services;
 
-public class AutenticacaoService : IAutenticacaoService
+public class AutenticacaoService : Service, IAutenticacaoService
 {
     private readonly HttpClient _httpClient;
 
@@ -22,7 +22,17 @@ public class AutenticacaoService : IAutenticacaoService
 
         var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/autenticar", loginContent);
 
-        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        if (!TratarErrosResponse(response))
+        {
+            return new UsuarioRespostaLogin
+            {
+                ResponseResult = JsonSerializer.Deserialize<ResponseResult>(await response.Content.ReadAsStringAsync(), options)
+            };
+        }
+
+        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync(), options);
     }
 
     public async Task<UsuarioRespostaLogin> Registro(UsuarioRegistro usuarioRegistro)
@@ -34,6 +44,16 @@ public class AutenticacaoService : IAutenticacaoService
 
         var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/nova-conta", registroContent);
 
-        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync());
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        if (!TratarErrosResponse(response))
+        {
+            return new UsuarioRespostaLogin
+            {
+                ResponseResult = JsonSerializer.Deserialize<ResponseResult>(await response.Content.ReadAsStringAsync(), options)
+            };
+        }
+
+        return JsonSerializer.Deserialize<UsuarioRespostaLogin>(await response.Content.ReadAsStringAsync(), options);
     }
 }

@@ -34,6 +34,7 @@ public class UsuarioRespostaLogin
     public string AccessToken { get; set; } = string.Empty;
     public double ExpiresIn { get; set; }
     public UsuarioToken UsuarioToken { get; set; } = new();
+    public ResponseResult ResponseResult { get; set; } = new();
 }
 
 public class UsuarioToken
