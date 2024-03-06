@@ -1,4 +1,6 @@
-﻿namespace KBM.WebApp.MVC.Configuration;
+﻿using KBM.WebApp.MVC.Extensions;
+
+namespace KBM.WebApp.MVC.Configuration;
 
 public static class WebAppConfig
 {
@@ -11,7 +13,8 @@ public static class WebAppConfig
     {
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/erro/500");
+            app.UseStatusCodePagesWithRedirects("/erro/{0}");
             app.UseHsts();
         }
 
@@ -21,6 +24,8 @@ public static class WebAppConfig
         app.UseRouting();
 
         app.UseIdentityConfiguration();
+
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllerRoute(
             name: "default",
