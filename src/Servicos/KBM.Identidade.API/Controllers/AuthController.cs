@@ -29,8 +29,6 @@ public class AuthController : MainController
     [HttpPost("nova-conta")]
     public async Task<ActionResult> Registrar(UsuarioRegistro usuarioRegistro)
     {
-        return new StatusCodeResult(401);
-
         if (!ModelState.IsValid) return CustomReponse(ModelState);
 
         var usuario = new IdentityUser
