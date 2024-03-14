@@ -1,4 +1,6 @@
-﻿using KBM.WebApp.MVC.Models;
+﻿using KBM.WebApp.MVC.Extensions;
+using KBM.WebApp.MVC.Models;
+using Microsoft.Extensions.Options;
 
 namespace KBM.WebApp.MVC.Services;
 
@@ -6,8 +8,10 @@ public class AutenticacaoService : Service, IAutenticacaoService
 {
     private readonly HttpClient _httpClient;
 
-    public AutenticacaoService(HttpClient httpClient)
+    public AutenticacaoService(HttpClient httpClient, IOptions<AppSettings> settings)
     {
+        httpClient.BaseAddress = new Uri(settings.Value.AutenticacaoUrl);
+
         _httpClient = httpClient;
     }
 
@@ -15,7 +19,7 @@ public class AutenticacaoService : Service, IAutenticacaoService
     {
         var loginContent = ObterConteudo(usuarioLogin);
 
-        var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/autenticar", loginContent);
+        var response = await _httpClient.PostAsync("/api/identidade/autenticar", loginContent);
 
         if (!TratarErrosResponse(response))
         {
@@ -31,7 +35,7 @@ public class AutenticacaoService : Service, IAutenticacaoService
     {
         var registroContent = ObterConteudo(usuarioRegistro);
 
-        var response = await _httpClient.PostAsync("https://localhost:7016/api/identidade/nova-conta", registroContent);        
+        var response = await _httpClient.PostAsync("/api/identidade/nova-conta", registroContent);        
 
         if (!TratarErrosResponse(response))
         {
